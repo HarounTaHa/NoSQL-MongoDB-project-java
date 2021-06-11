@@ -6,6 +6,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,13 +81,51 @@ public class FinalProject {
                     }
                     break;
                 case 3:
-                    deleteProduct();
+                    
+                    System.out.println("Enter the condition for delete operation ");
+                    System.out.println("==================Choose Key================================\n"
+                            + "1.ID\n"
+                            + "\n"
+                            + "2.Name\n"
+                            + "\n"
+                            + "3. Description\n"
+                            + "\n"
+                            + "4. Price\n"
+                            + "\n"
+                            + "5. Weight (Application only for Wighted Products)\n"
+                            + "\n"
+                            + "6. Width (Application only for Dimensional Products)\n"
+                            + "\n"
+                            + "7. Height (Application only for Dimensional Products)\n"
+                            + "==================================================");
+                    System.out.println("Whats your Key? (Enter the number only : )");
+                    inputComparisonKey = input.nextInt();
+
+                    System.out.println("================= Choose operator =================================\n"
+                            + "1.Greater Than\n"
+                            + "\n"
+                            + "2.Greater Than or Equals\n"
+                            + "\n"
+                            + "3. Less Than\n"
+                            + "\n"
+                            + "4. Less Than or Equals\n"
+                            + "\n"
+                            + "5. Equals\n"
+                            + "\n"
+                            + "6. Not Equals\n"
+                            + "==================================================");
+                    System.out.println("Whats your operator? (Enter the number only : )");
+                    inputComparisonOperator = input.nextInt();
+                    System.out.println("Enter Value : ");
+                    valueComparison = input.next();
+                    businessLogicDeleteProduct(inputComparisonOperator, inputComparisonKey, valueComparison);
+
                     break;
                 case 4:
                     updateProduct();
                     break;
                 case 5:
-                    System.out.println("Enter the condition for Replace operation ");
+                    System.out.println("Enter the condition for replace operation ");
                     System.out.println("==================Choose Key================================\n"
                             + "1.ID\n"
                             + "\n"
@@ -124,7 +163,6 @@ public class FinalProject {
                     valueComparison = input.next();
                     businessLogicReplaceProduct(inputComparisonOperator, inputComparisonKey, valueComparison);
 
-//                    replaceProduct();
                     break;
                 case 6:
 
@@ -224,8 +262,30 @@ public class FinalProject {
         return list;
     }
 
-    public static void deleteProduct() {
+    public static long deleteProduct(String operator, String key, Object value) {
+        DeleteResult result = null;
+        switch (operator) {
+            case Operators.GREATER_THAN:
+                result = collection.deleteMany(Filters.gt(key, value));
+                break;
+            case Operators.GREATER_THAN_OR_EQUALS:
+                result = collection.deleteMany(Filters.gte(key, value));
+                break;
+            case Operators.LESS_THAN:
+                result = collection.deleteMany(Filters.lt(key, value));
+                break;
+            case Operators.LESS_THAN_OR_EQUALS:
+                result = collection.deleteMany(Filters.lte(key, value));
+                break;
+            case Operators.EQUALS:
+                result = collection.deleteMany(Filters.eq(key, value));
+                break;
+            case Operators.NOT_EQUALS:
+                result = collection.deleteMany(Filters.ne(key, value));
+                break;
+        }
 
+        return result.getDeletedCount();
     }
 
     public static void updateProduct() {
@@ -1010,4 +1070,233 @@ public class FinalProject {
         }
     }
 
+    public static void businessLogicDeleteProduct(int inputComparisonOperator, int inputComparisonKey, Object valueComparison) {
+        int value;
+        switch (inputComparisonOperator) {
+            case 1:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN, "id", value);
+                        break;
+                    case 2:
+                        deleteProduct(Operators.GREATER_THAN, "name", valueComparison);
+
+                        break;
+                    case 3:
+                        deleteProduct(Operators.GREATER_THAN, "description", valueComparison);
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN, "price", value);
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN, "weight", value);
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN, "width", value);
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN, "height", value);
+
+                        break;
+                }
+                break;
+            case 2:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN_OR_EQUALS, "id", value);
+                        break;
+                    case 2:
+                        deleteProduct(Operators.GREATER_THAN_OR_EQUALS, "name", valueComparison);
+
+                        break;
+                    case 3:
+                        deleteProduct(Operators.GREATER_THAN_OR_EQUALS, "description", valueComparison);
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN_OR_EQUALS, "price", value);
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN_OR_EQUALS, "weight", value);
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN_OR_EQUALS, "width", value);
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.GREATER_THAN_OR_EQUALS, "height", value);
+
+                        break;
+                }
+
+                break;
+            case 3:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN, "id", value);
+
+                        break;
+                    case 2:
+                        deleteProduct(Operators.LESS_THAN, "name", valueComparison);
+
+                        break;
+                    case 3:
+                        deleteProduct(Operators.LESS_THAN, "description", valueComparison);
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN, "price", value);
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN, "weight", value);
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN, "width", value);
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN, "height", value);
+
+                        break;
+                }
+
+                break;
+            case 4:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN_OR_EQUALS, "id", value);
+
+                        break;
+                    case 2:
+                        deleteProduct(Operators.LESS_THAN_OR_EQUALS, "name", valueComparison);
+                        break;
+                    case 3:
+                        deleteProduct(Operators.LESS_THAN_OR_EQUALS, "description", valueComparison);
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN_OR_EQUALS, "price", value);
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN_OR_EQUALS, "weight", value);
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN_OR_EQUALS, "width", value);
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.LESS_THAN_OR_EQUALS, "height", value);
+
+                        break;
+                }
+
+                break;
+            case 5:
+
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.EQUALS, "id", value);
+
+                        break;
+                    case 2:
+                        deleteProduct(Operators.EQUALS, "name", valueComparison);
+
+                        break;
+                    case 3:
+                        deleteProduct(Operators.EQUALS, "description", valueComparison);
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.EQUALS, "price", value);
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.EQUALS, "weight", value);
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.EQUALS, "width", value);
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.EQUALS, "height", value);
+
+                        break;
+                }
+
+                break;
+            case 6:
+
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.NOT_EQUALS, "id", value);
+
+                        break;
+                    case 2:
+                        deleteProduct(Operators.NOT_EQUALS, "name", valueComparison);
+
+                        break;
+                    case 3:
+                        deleteProduct(Operators.NOT_EQUALS, "description", valueComparison);
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.NOT_EQUALS, "price", value);
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.NOT_EQUALS, "weight", value);
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.NOT_EQUALS, "width", value);
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        deleteProduct(Operators.NOT_EQUALS, "height", value);
+                        break;
+                }
+
+                break;
+        }
+    }
 }
