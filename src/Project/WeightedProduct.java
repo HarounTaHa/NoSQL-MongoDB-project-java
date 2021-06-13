@@ -23,7 +23,7 @@ public class WeightedProduct extends Product{
 
     @Override
     public String toString() {
-        return getId() + ", " + getName() + ", " + getDescription() 
-                + ", " + getPrice() + ", " + weight + ", W";
+        return "ID : "+getId() + ", Name : " + getName() + ", Description : " + getDescription() 
+                + ",Price: " + getPrice() + ", Weight :" + weight + ", WeightedProduct";
     }
 }

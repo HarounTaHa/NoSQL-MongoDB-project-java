@@ -33,7 +33,7 @@ public class DimensionalProduct extends Product{
 
     @Override
     public String toString() {
-        return getId() + ", " + getName() + ", " + getDescription() 
-                + ", " + getPrice() + ", " + width + ", " + height + ", D";
+        return "ID : "+getId() + ", Name : " + getName() + ", Description: " + getDescription() 
+                + ",Price:  " + getPrice() + ", width : " + width + ", height: " + height + ", Dimensional Product";
     }
 }

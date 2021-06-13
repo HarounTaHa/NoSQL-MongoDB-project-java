@@ -38,6 +38,8 @@ public class FinalProject {
         int inputComparisonOperator;
         int inputComparisonKey;
         Object valueComparison;
+        int inputUpdatedKey;
+        Object valueUpdatedComparison;
         do {
             showMenu();
             choice = input.nextInt();
@@ -81,7 +83,7 @@ public class FinalProject {
                     }
                     break;
                 case 3:
-                    
+
                     System.out.println("Enter the condition for delete operation ");
                     System.out.println("==================Choose Key================================\n"
                             + "1.ID\n"
@@ -122,7 +124,62 @@ public class FinalProject {
 
                     break;
                 case 4:
-                    updateProduct();
+                    System.out.println("Enter the condition for update operation ");
+                    System.out.println("==================Choose Key================================\n"
+                            + "1.ID\n"
+                            + "\n"
+                            + "2.Name\n"
+                            + "\n"
+                            + "3. Description\n"
+                            + "\n"
+                            + "4. Price\n"
+                            + "\n"
+                            + "5. Weight (Application only for Wighted Products)\n"
+                            + "\n"
+                            + "6. Width (Application only for Dimensional Products)\n"
+                            + "\n"
+                            + "7. Height (Application only for Dimensional Products)\n"
+                            + "==================================================");
+                    System.out.println("Whats your Key? (Enter the number only : )");
+                    inputComparisonKey = input.nextInt();
+                    System.out.println("================= Choose operator =================================\n"
+                            + "1.Greater Than\n"
+                            + "\n"
+                            + "2.Greater Than or Equals\n"
+                            + "\n"
+                            + "3. Less Than\n"
+                            + "\n"
+                            + "4. Less Than or Equals\n"
+                            + "\n"
+                            + "5. Equals\n"
+                            + "\n"
+                            + "6. Not Equals\n"
+                            + "==================================================");
+                    System.out.println("Whats your operator? (Enter the number only : )");
+                    inputComparisonOperator = input.nextInt();
+                    System.out.println("Enter Value : ");
+                    valueComparison = input.next();
+                    System.out.println("Enter the key you want to update ");
+                    System.out.println("==================Choose Key================================\n"
+                            + "1.ID\n"
+                            + "\n"
+                            + "2.Name\n"
+                            + "\n"
+                            + "3. Description\n"
+                            + "\n"
+                            + "4. Price\n"
+                            + "\n"
+                            + "5. Weight (Application only for Wighted Products)\n"
+                            + "\n"
+                            + "6. Width (Application only for Dimensional Products)\n"
+                            + "\n"
+                            + "7. Height (Application only for Dimensional Products)\n"
+                            + "==================================================");
+                    System.out.println("Whats your Key? (Enter the number only : )");
+                    inputUpdatedKey = input.nextInt();
+                    System.out.println("Enter Value : ");
+                    valueUpdatedComparison = input.next();
+                    businessLogicUpdateProduct(inputComparisonOperator, inputComparisonKey, valueComparison, inputUpdatedKey, valueUpdatedComparison);
                     break;
                 case 5:
                     System.out.println("Enter the condition for replace operation ");
@@ -232,7 +289,8 @@ public class FinalProject {
     public static void showAllProducts() {
 
         for (Product p : getAllProduct()) {
-            System.out.println("----------" + p.toString());
+            System.out.println("-" + p.toString());
+
         }
 
     }
@@ -251,8 +309,6 @@ public class FinalProject {
     public static List<Product> getAllProduct() {
         List<Product> list = new ArrayList<>();
         for (Document doc : collection.find()) {
-
-            System.out.println("-----" + doc);
             if (doc.containsKey("weight")) {
                 list.add(new GsonBuilder().create().fromJson(doc.toJson(), WeightedProduct.class));
             } else {
@@ -288,7 +344,1246 @@ public class FinalProject {
         return result.getDeletedCount();
     }
 
-    public static void updateProduct() {
+    public static long updateProduct(String operator, String key, Object value, String updatedKey, Object updatedValue) {
+        UpdateResult result = null;
+        Document document = new Document("$set", new Document(updatedKey, updatedValue));
+
+        switch (operator) {
+            case Operators.GREATER_THAN:
+                result = collection.updateMany(Filters.gt(key, value), document);
+                break;
+            case Operators.GREATER_THAN_OR_EQUALS:
+                result = collection.updateMany(Filters.gte(key, value), document);
+                break;
+            case Operators.LESS_THAN:
+                result = collection.replaceOne(Filters.lt(key, value), document);
+                break;
+            case Operators.LESS_THAN_OR_EQUALS:
+                result = collection.updateMany(Filters.lte(key, value), document);
+                break;
+            case Operators.EQUALS:
+                result = collection.updateMany(Filters.eq(key, value), document);
+                break;
+            case Operators.NOT_EQUALS:
+                result = collection.updateMany(Filters.ne(key, value), document);
+                break;
+        }
+
+        return result.getModifiedCount();
+
+    }
+
+    public static void businessLogicUpdateProduct(int inputComparisonOperator, int inputComparisonKey, Object valueComparison,
+            int inputUpdatedKey, Object valueUpdatedComparison) {
+        int value;
+        int valueUpdated;
+
+        switch (inputComparisonOperator) {
+            case 1:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN, "id", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN, "id", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN, "id", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN, "id", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN, "id", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN, "id", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN, "id", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 2:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN, "name", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN, "name", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN, "name", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+
+                                updateProduct(Operators.GREATER_THAN, "name", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+
+                                updateProduct(Operators.GREATER_THAN, "name", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+
+                                updateProduct(Operators.GREATER_THAN, "name", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+
+                                updateProduct(Operators.GREATER_THAN, "name", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 3:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN, "description", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN, "description", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN, "description", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+
+                                updateProduct(Operators.GREATER_THAN, "description", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+
+                                updateProduct(Operators.GREATER_THAN, "description", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+
+                                updateProduct(Operators.GREATER_THAN, "description", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+
+                                updateProduct(Operators.GREATER_THAN, "description", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN, "price", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN, "price", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN, "price", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN, "price", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN, "price", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN, "price", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN, "price", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN, "weight", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN, "weight", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN, "weight", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN, "weight", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN, "weight", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN, "weight", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN, "weight", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN, "width", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN, "width", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN, "width", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN, "width", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN, "width", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN, "width", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN, "width", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN, "height", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN, "height", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN, "height", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN, "height", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN, "height", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN, "height", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN, "height", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                }
+                break;
+            case 2:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "id", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "id", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "id", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "id", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "id", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "id", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "id", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 2:
+
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "name", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "name", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "name", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "name", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "name", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "name", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "name", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+                        break;
+                    case 3:
+
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "description", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "description", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "description", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "description", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "description", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "description", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "description", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "price", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "price", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "price", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "price", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "price", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "price", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "price", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "weight", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "weight", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "weight", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "weight", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "weight", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "weight", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "weight", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "width", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "width", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "width", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "width", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "width", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "width", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "width", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "height", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "height", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "height", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "height", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "height", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "height", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.GREATER_THAN_OR_EQUALS, "height", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                }
+
+                break;
+            case 3:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN, "id", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN, "id", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN, "id", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN, "id", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN, "id", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN, "id", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN, "id", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 2:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN, "name", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN, "name", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN, "name", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN, "name", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN, "name", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN, "name", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN, "name", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 3:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN, "description", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN, "description", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN, "description", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN, "description", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN, "description", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN, "description", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN, "description", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN, "price", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN, "price", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN, "price", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN, "price", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN, "price", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN, "price", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN, "price", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN, "weight", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN, "weight", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN, "weight", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN, "weight", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN, "weight", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN, "weight", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN, "weight", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN, "width", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN, "width", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN, "width", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN, "width", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN, "width", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN, "width", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN, "width", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN, "height", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN, "height", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN, "height", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN, "height", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN, "height", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN, "height", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN, "height", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                }
+
+                break;
+            case 4:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "id", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "id", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "id", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "id", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "id", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "id", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "id", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 2:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "name", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "name", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "name", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "name", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "name", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "name", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "name", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 3:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "description", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "description", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "description", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "description", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "description", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "description", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "description", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "price", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "price", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "price", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "price", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "price", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "price", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "price", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "weight", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "weight", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "weight", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "weight", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "weight", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "weight", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "weight", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "width", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "width", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "width", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "width", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "width", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "width", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "width", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "height", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "height", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "height", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "height", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "height", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "height", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.LESS_THAN_OR_EQUALS, "height", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                }
+
+                break;
+            case 5:
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.EQUALS, "id", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.EQUALS, "id", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.EQUALS, "id", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.EQUALS, "id", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.EQUALS, "id", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.EQUALS, "id", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.EQUALS, "id", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 2:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.EQUALS, "name", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.EQUALS, "name", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.EQUALS, "name", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.EQUALS, "name", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.EQUALS, "name", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.EQUALS, "name", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.EQUALS, "name", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 3:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.EQUALS, "description", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.EQUALS, "description", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.EQUALS, "description", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.EQUALS, "description", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.EQUALS, "description", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.EQUALS, "description", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.EQUALS, "description", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.EQUALS, "price", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.EQUALS, "price", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.EQUALS, "price", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.EQUALS, "price", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.EQUALS, "price", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.EQUALS, "price", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.EQUALS, "price", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.EQUALS, "weight", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.EQUALS, "weight", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.EQUALS, "weight", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.EQUALS, "weight", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.EQUALS, "weight", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.EQUALS, "weight", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.EQUALS, "weight", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.EQUALS, "width", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.EQUALS, "width", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.EQUALS, "width", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.EQUALS, "width", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.EQUALS, "width", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.EQUALS, "width", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.EQUALS, "width", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 7:
+
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.EQUALS, "height", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.EQUALS, "height", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.EQUALS, "height", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.EQUALS, "height", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.EQUALS, "height", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.EQUALS, "height", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.EQUALS, "height", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                }
+
+                break;
+            case 6:
+
+                switch (inputComparisonKey) {
+                    case 1:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.NOT_EQUALS, "id", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.NOT_EQUALS, "id", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.NOT_EQUALS, "id", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.NOT_EQUALS, "id", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.NOT_EQUALS, "id", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.NOT_EQUALS, "id", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.NOT_EQUALS, "id", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 2:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.NOT_EQUALS, "name", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.NOT_EQUALS, "name", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.NOT_EQUALS, "name", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.NOT_EQUALS, "name", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.NOT_EQUALS, "name", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.NOT_EQUALS, "name", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.NOT_EQUALS, "name", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 3:
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.NOT_EQUALS, "description", valueComparison, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.NOT_EQUALS, "description", valueComparison, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.NOT_EQUALS, "description", valueComparison, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.NOT_EQUALS, "description", valueComparison, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.NOT_EQUALS, "description", valueComparison, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.NOT_EQUALS, "description", valueComparison, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.NOT_EQUALS, "description", valueComparison, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 4:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.NOT_EQUALS, "price", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.NOT_EQUALS, "price", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.NOT_EQUALS, "price", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.NOT_EQUALS, "price", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.NOT_EQUALS, "price", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.NOT_EQUALS, "price", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.NOT_EQUALS, "price", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 5:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.NOT_EQUALS, "weight", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.NOT_EQUALS, "weight", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.NOT_EQUALS, "weight", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.NOT_EQUALS, "weight", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.NOT_EQUALS, "weight", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.NOT_EQUALS, "weight", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.NOT_EQUALS, "weight", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 6:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.NOT_EQUALS, "width", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.NOT_EQUALS, "width", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.NOT_EQUALS, "width", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.NOT_EQUALS, "width", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.NOT_EQUALS, "width", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.NOT_EQUALS, "width", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.NOT_EQUALS, "width", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                    case 7:
+                        value = Integer.valueOf((String) valueComparison);
+                        valueUpdated = Integer.valueOf((String) valueUpdatedComparison);
+                        switch (inputUpdatedKey) {
+                            case 1:
+                                updateProduct(Operators.NOT_EQUALS, "height", value, "id", valueUpdated);
+                                break;
+                            case 2:
+                                updateProduct(Operators.NOT_EQUALS, "height", value, "name", valueUpdatedComparison);
+                                break;
+                            case 3:
+                                updateProduct(Operators.NOT_EQUALS, "height", value, "description", valueUpdatedComparison);
+                                break;
+                            case 4:
+                                updateProduct(Operators.NOT_EQUALS, "height", value, "price", valueUpdated);
+                                break;
+                            case 5:
+                                updateProduct(Operators.NOT_EQUALS, "height", value, "weight", valueUpdated);
+                                break;
+                            case 6:
+                                updateProduct(Operators.NOT_EQUALS, "height", value, "width", valueUpdated);
+                                break;
+                            case 7:
+                                updateProduct(Operators.NOT_EQUALS, "height", value, "height", valueUpdated);
+                                break;
+                        }
+
+                        break;
+                }
+
+                break;
+        }
 
     }
 
